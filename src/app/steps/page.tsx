@@ -1,5 +1,7 @@
 "use client";
 
+export const dynamic = "force-dynamic"; // ✅ tell Next.js to render runtime only
+
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import "@/app/index.css";
