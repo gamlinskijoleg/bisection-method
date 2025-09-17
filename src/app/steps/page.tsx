@@ -1,9 +1,8 @@
+
 "use client";
 
-export const dynamic = "force-dynamic"; // ✅ tell Next.js to render runtime only
-
+import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
 import "@/app/index.css";
 
 interface Step {
@@ -14,7 +13,7 @@ interface Step {
 	error: number;
 }
 
-export default function StepsPage() {
+function StepsContent() {
 	const searchParams = useSearchParams();
 	const [stepsData, setStepsData] = useState<Step[]>([]);
 	const [ready, setReady] = useState(false);
@@ -85,5 +84,13 @@ export default function StepsPage() {
 				</div>
 			</div>
 		</div>
+	);
+}
+
+export default function StepsPage() {
+	return (
+		<Suspense fallback={<p>Loading...</p>}>
+			<StepsContent />
+		</Suspense>
 	);
 }
