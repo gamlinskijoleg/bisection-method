@@ -1,39 +1,54 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import "@/app/index.css"
+import { useEffect, useState } from "react";
+import "@/app/index.css";
+
+interface Step {
+	left: number;
+	right: number;
+	mid: number;
+	fMid: number;
+	error: number;
+}
 
 export default function StepsPage() {
 	const searchParams = useSearchParams();
+	const [stepsData, setStepsData] = useState<Step[]>([]);
+	const [ready, setReady] = useState(false);
 
-	const a = Number(searchParams!.get("a"));
-	const b = Number(searchParams!.get("b"));
-	const eps = Number(searchParams!.get("eps"));
+	useEffect(() => {
+		const a = Number(searchParams.get("a"));
+		const b = Number(searchParams.get("b"));
+		const eps = Number(searchParams.get("eps"));
 
-	const f = (x: number) => x ** 3 - 11 * x - 19;
+		if (isNaN(a) || isNaN(b) || isNaN(eps)) return;
 
-	const bisectionSteps = (func: (x: number) => number, a: number, b: number, eps: number) => {
-		let left = a;
-		let right = b;
-		const stepsArr: { left: number; right: number; mid: number; fMid: number; error: number }[] = [];
+		const f = (x: number) => x ** 3 - 11 * x - 19;
 
-		while (Math.abs(right - left) >= eps) {
-			const mid = (left + right) / 2;
-			const fMid = func(mid);
-			const errorVal = (right - left) / 2;
-			stepsArr.push({ left, right, mid, fMid, error: errorVal });
+		const bisectionSteps = (func: (x: number) => number, a: number, b: number, eps: number) => {
+			let left = a;
+			let right = b;
+			const stepsArr: Step[] = [];
 
-			if (func(left) * fMid <= 0) {
-				right = mid;
-			} else {
-				left = mid;
+			while (Math.abs(right - left) >= eps) {
+				const mid = (left + right) / 2;
+				const fMid = func(mid);
+				const errorVal = (right - left) / 2;
+				stepsArr.push({ left, right, mid, fMid, error: errorVal });
+
+				if (func(left) * fMid <= 0) right = mid;
+				else left = mid;
 			}
-		}
 
-		return stepsArr;
-	};
+			return stepsArr;
+		};
 
-	const stepsData = bisectionSteps(f, a, b, eps);
+		setStepsData(bisectionSteps(f, a, b, eps));
+		setReady(true);
+	}, [searchParams]);
+
+	if (!ready) return <p>Loading...</p>;
 
 	return (
 		<div className="container ctn">
